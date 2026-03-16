@@ -1,6 +1,16 @@
-# HortiHeatTracker (Next.js)
+# HortiHeat Tracker
 
-This project is a Next.js + Tailwind conversion of the original Shiny app.
+HortiHeat Tracker is a precision agriculture web application that helps estimate harvest timing for horticultural commodities using heat-unit accumulation.
+
+This project is a Next.js + Tailwind implementation and supports both local CSV data and location-based weather retrieval.
+
+## Key Features
+
+- GDH-based heat-unit accumulation tracking.
+- Commodity-oriented harvest timing workflow via cumulative HU targets.
+- Local CSV import for on-farm sensor data.
+- Location-based weather loading and short-range forecast support.
+- Interactive charts for humidity, temperature, and heat-unit trends.
 
 ## Setup
 
@@ -10,15 +20,14 @@ This project is a Next.js + Tailwind conversion of the original Shiny app.
 npm install
 ```
 
-2. Run development server:
+2. Run the development server:
 
 ```bash
 npm run dev
 ```
 
-Then open http://localhost:3000.
+3. Open http://localhost:3000.
 
 ## Forecast Data Source
 
-Forecast is provided by Open-Meteo (no API key required).
-Use the Latitude and Longitude inputs in the app before clicking "Fetch 14-day Forecast".
+Forecast data is provided by Open-Meteo (no API key required).
