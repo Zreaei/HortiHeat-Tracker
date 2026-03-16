@@ -1,0 +1,51 @@
+@import "tailwindcss";
+
+:root {
+  --paper: #f6f2e9;
+  --ink: #13212c;
+  --ink-soft: #2a3e4d;
+  --accent: #dd5f2a;
+  --accent-soft: #f2b880;
+  --mint: #5f8c6f;
+  --panel: rgba(255, 252, 244, 0.88);
+  --line: rgba(19, 33, 44, 0.2);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  min-height: 100%;
+}
+
+body {
+  color: var(--ink);
+  font-family: var(--font-space-grotesk), sans-serif;
+  background:
+    radial-gradient(circle at 8% 18%, rgba(242, 184, 128, 0.6) 0%, transparent 28%),
+    radial-gradient(circle at 90% 2%, rgba(95, 140, 111, 0.42) 0%, transparent 32%),
+    linear-gradient(165deg, #fdf8ec 0%, #ede6d8 58%, #e9dfd0 100%);
+}
+
+.mono {
+  font-family: var(--font-plex-mono), monospace;
+}
+
+.rise-up {
+  animation: riseUp 0.6s ease both;
+}
+
+@keyframes riseUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
