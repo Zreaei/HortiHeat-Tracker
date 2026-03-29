@@ -1,4 +1,10 @@
 import { NextResponse } from "next/server";
+import { addDays, localDateLabel } from "../_shared/date";
+import {
+  areCoordinatesInvalid,
+  areCoordinatesOutOfRange,
+  isDateRangeInvalid,
+} from "../_shared/validation";
 
 type OpenMeteoHourly = {
   hourly?: {
@@ -7,19 +13,6 @@ type OpenMeteoHourly = {
     relative_humidity_2m: number[];
   };
 };
-
-function localDateLabel(value: Date): string {
-  const year = value.getFullYear();
-  const month = String(value.getMonth() + 1).padStart(2, "0");
-  const day = String(value.getDate()).padStart(2, "0");
-  return `${year}-${month}-${day}`;
-}
-
-function addDays(base: Date, days: number): Date {
-  const next = new Date(base);
-  next.setDate(next.getDate() + days);
-  return next;
-}
 
 function splitDateRange(startDate: string, endDate: string, chunkDays: number): Array<{ start: string; end: string }> {
   const ranges: Array<{ start: string; end: string }> = [];
@@ -63,30 +56,23 @@ export async function GET(request: Request) {
   const startDate = searchParams.get("startDate") ?? "";
   const endDate = searchParams.get("endDate") ?? "";
 
-  if (Number.isNaN(latitude) || Number.isNaN(longitude)) {
+  if (areCoordinatesInvalid(latitude, longitude)) {
     return NextResponse.json(
       { error: "latitude and longitude query parameters are required." },
       { status: 400 }
     );
   }
 
-  if (latitude < -90 || latitude > 90 || longitude < -180 || longitude > 180) {
+  if (areCoordinatesOutOfRange(latitude, longitude)) {
     return NextResponse.json(
       { error: "Invalid coordinates. Latitude must be [-90, 90] and longitude [-180, 180]." },
       { status: 400 }
     );
   }
 
-  if (!startDate || !endDate) {
+  if (isDateRangeInvalid(startDate, endDate)) {
     return NextResponse.json(
-      { error: "startDate and endDate query parameters are required." },
-      { status: 400 }
-    );
-  }
-
-  if (startDate > endDate) {
-    return NextResponse.json(
-      { error: "startDate must be earlier than or equal to endDate." },
+      { error: "startDate and endDate must be provided and startDate <= endDate." },
       { status: 400 }
     );
   }
