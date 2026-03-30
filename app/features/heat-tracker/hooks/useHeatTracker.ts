@@ -19,8 +19,8 @@ export function useHeatTracker() {
   const [activeTab, setActiveTab] = useState<TabLabel>("Data Preview");
   const [dataSourceMode, setDataSourceMode] = useState<DataSourceMode>("csv");
   const [commodity, setCommodity] = useState<Commodity>(DEFAULTS.commodity);
-  const [tbase, setTbase] = useState<number>(DEFAULTS.tbase);
-  const [cumhu, setCumhu] = useState<number>(DEFAULTS.cumhu);
+  const [tbase, setTbase] = useState<number>(commodityPreferences[DEFAULTS.commodity].tbase);
+  const [cumhu, setCumhu] = useState<number>(commodityPreferences[DEFAULTS.commodity].cumhu);
   const [latitude, setLatitude] = useState<number>(DEFAULTS.latitude);
   const [longitude, setLongitude] = useState<number>(DEFAULTS.longitude);
   const [rawData, setRawData] = useState<RawRow[]>([]);
@@ -326,11 +326,11 @@ export function useHeatTracker() {
   };
 
   const onTbaseChange = (value: string) => {
-    setTbase(parseNumberInput(value, DEFAULTS.tbase));
+    setTbase(parseNumberInput(value, commodityPreferences[commodity].tbase));
   };
 
   const onCumhuChange = (value: string) => {
-    setCumhu(parseNumberInput(value, DEFAULTS.cumhu));
+    setCumhu(parseNumberInput(value, commodityPreferences[commodity].cumhu));
   };
 
   const onCommodityChange = (value: string) => {

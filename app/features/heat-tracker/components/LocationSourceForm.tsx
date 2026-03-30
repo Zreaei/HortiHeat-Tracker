@@ -1,4 +1,4 @@
-import { commodityOptions } from "../constants";
+import { commodityOptions, commodityPreferences } from "../constants";
 import type { Commodity } from "../types";
 import { FormFieldCard } from "./FormFieldCard";
 
@@ -78,7 +78,7 @@ export function LocationSourceForm({
       <FormFieldCard label="Tbase">
         <input
           type="number"
-          value={Number.isFinite(tbase) ? tbase : 10}
+          value={Number.isFinite(tbase) ? tbase : commodityPreferences[commodity].tbase}
           onChange={(e) => onTbaseChange(e.target.value)}
           className="w-full rounded-lg border border-(--line) bg-white px-3 py-2"
         />
@@ -87,7 +87,7 @@ export function LocationSourceForm({
       <FormFieldCard label="Cumulative HU target">
         <input
           type="number"
-          value={Number.isFinite(cumhu) ? cumhu : 900}
+          value={Number.isFinite(cumhu) ? cumhu : commodityPreferences[commodity].cumhu}
           onChange={(e) => onCumhuChange(e.target.value)}
           className="w-full rounded-lg border border-(--line) bg-white px-3 py-2"
         />

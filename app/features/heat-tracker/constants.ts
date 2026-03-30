@@ -11,7 +11,7 @@ export const tabs: readonly TabLabel[] = [
 export const DEFAULTS = {
   commodity: "Red Onion",
   tbase: 10,
-  cumhu: 900,
+  cumhu: 740,
   latitude: -6.5574,
   longitude: 106.7262,
   dataPreviewPageSize: 50,
