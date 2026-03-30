@@ -15,6 +15,7 @@ export default function HomePage() {
   const {
     activeTab,
     dataSourceMode,
+    commodity,
     tbase,
     cumhu,
     latitude,
@@ -46,6 +47,7 @@ export default function HomePage() {
     reloadCsvData,
     onLatitudeChange,
     onLongitudeChange,
+    onCommodityChange,
     onTbaseChange,
     onCumhuChange,
     onPlantingEndDateChange,
@@ -66,6 +68,7 @@ export default function HomePage() {
           <SourceModeToggle dataSourceMode={dataSourceMode} onSwitch={switchDataSourceMode} />
           {dataSourceMode === "csv" ? (
             <CsvSourceForm
+              commodity={commodity}
               latitude={latitude}
               longitude={longitude}
               tbase={tbase}
@@ -77,6 +80,7 @@ export default function HomePage() {
               onFileUpload={handleFileUpload}
               onLatitudeChange={onLatitudeChange}
               onLongitudeChange={onLongitudeChange}
+              onCommodityChange={onCommodityChange}
               onTbaseChange={onTbaseChange}
               onCumhuChange={onCumhuChange}
               onPlantingEndDateChange={onPlantingEndDateChange}
@@ -84,6 +88,7 @@ export default function HomePage() {
             />
           ) : (
             <LocationSourceForm
+              commodity={commodity}
               latitude={latitude}
               longitude={longitude}
               tbase={tbase}
@@ -93,6 +98,7 @@ export default function HomePage() {
               maxPlantingEndDate={maxPlantingEndDate}
               onLatitudeChange={onLatitudeChange}
               onLongitudeChange={onLongitudeChange}
+              onCommodityChange={onCommodityChange}
               onTbaseChange={onTbaseChange}
               onCumhuChange={onCumhuChange}
               onPlantingStartDateChange={setPlantingStartDate}

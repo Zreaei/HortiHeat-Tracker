@@ -1,7 +1,7 @@
 import type { ChangeEvent } from "react";
 import { useMemo, useState } from "react";
-import { DEFAULTS } from "../constants";
-import type { DataSourceMode, ForecastRow, RawRow, TabLabel } from "../types";
+import { commodityOptions, commodityPreferences, DEFAULTS } from "../constants";
+import type { Commodity, DataSourceMode, ForecastRow, RawRow, TabLabel } from "../types";
 import { addDays, localDateLabel, parseDate } from "../utils/date";
 import { parseCsvFiles } from "../utils/csv-parser";
 import { parseNumberInput, round1 } from "../utils/number";
@@ -18,6 +18,7 @@ import {
 export function useHeatTracker() {
   const [activeTab, setActiveTab] = useState<TabLabel>("Data Preview");
   const [dataSourceMode, setDataSourceMode] = useState<DataSourceMode>("csv");
+  const [commodity, setCommodity] = useState<Commodity>(DEFAULTS.commodity);
   const [tbase, setTbase] = useState<number>(DEFAULTS.tbase);
   const [cumhu, setCumhu] = useState<number>(DEFAULTS.cumhu);
   const [latitude, setLatitude] = useState<number>(DEFAULTS.latitude);
@@ -332,6 +333,18 @@ export function useHeatTracker() {
     setCumhu(parseNumberInput(value, DEFAULTS.cumhu));
   };
 
+  const onCommodityChange = (value: string) => {
+    if (!commodityOptions.includes(value as Commodity)) {
+      return;
+    }
+
+    const nextCommodity = value as Commodity;
+    const prefs = commodityPreferences[nextCommodity];
+    setCommodity(nextCommodity);
+    setTbase(prefs.tbase);
+    setCumhu(prefs.cumhu);
+  };
+
   const onPlantingEndDateChange = (value: string) => {
     setPlantingEndDate(value > maxPlantingEndDate ? maxPlantingEndDate : value);
   };
@@ -339,6 +352,7 @@ export function useHeatTracker() {
   return {
     activeTab,
     dataSourceMode,
+    commodity,
     tbase,
     cumhu,
     latitude,
@@ -372,6 +386,7 @@ export function useHeatTracker() {
     onLongitudeChange,
     onTbaseChange,
     onCumhuChange,
+    onCommodityChange,
     onPlantingEndDateChange,
     loadLocationData,
   };

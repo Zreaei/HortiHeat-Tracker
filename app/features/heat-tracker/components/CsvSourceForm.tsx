@@ -1,7 +1,10 @@
 import type { ChangeEvent } from "react";
+import { commodityOptions } from "../constants";
+import type { Commodity } from "../types";
 import { FormFieldCard } from "./FormFieldCard";
 
 type CsvSourceFormProps = {
+  commodity: Commodity;
   latitude: number;
   longitude: number;
   tbase: number;
@@ -13,6 +16,7 @@ type CsvSourceFormProps = {
   onFileUpload: (event: ChangeEvent<HTMLInputElement>) => void;
   onLatitudeChange: (value: string) => void;
   onLongitudeChange: (value: string) => void;
+  onCommodityChange: (value: string) => void;
   onTbaseChange: (value: string) => void;
   onCumhuChange: (value: string) => void;
   onPlantingEndDateChange: (value: string) => void;
@@ -20,6 +24,7 @@ type CsvSourceFormProps = {
 };
 
 export function CsvSourceForm({
+  commodity,
   latitude,
   longitude,
   tbase,
@@ -31,6 +36,7 @@ export function CsvSourceForm({
   onFileUpload,
   onLatitudeChange,
   onLongitudeChange,
+  onCommodityChange,
   onTbaseChange,
   onCumhuChange,
   onPlantingEndDateChange,
@@ -60,6 +66,20 @@ export function CsvSourceForm({
           onChange={(e) => onLongitudeChange(e.target.value)}
           className="w-full rounded-lg border border-(--line) bg-white px-3 py-2"
         />
+      </FormFieldCard>
+
+      <FormFieldCard label="Commodity">
+        <select
+          value={commodity}
+          onChange={(e) => onCommodityChange(e.target.value)}
+          className="w-full rounded-lg border border-(--line) bg-white px-3 py-2"
+        >
+          {commodityOptions.map((option) => (
+            <option key={option} value={option}>
+              {option}
+            </option>
+          ))}
+        </select>
       </FormFieldCard>
 
       <FormFieldCard label="Tbase">
