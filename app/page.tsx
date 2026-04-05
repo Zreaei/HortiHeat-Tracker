@@ -20,11 +20,13 @@ export default function HomePage() {
     cumhu,
     latitude,
     longitude,
+    mapsLink,
+    mapsLinkFeedback,
+    hasResolvedMapsCoordinates,
     csvSourceRows,
     csvFileStartDate,
     plantingStartDate,
-    plantingEndDate,
-    maxPlantingEndDate,
+    maxAvailableDate,
     todayMarkerDate,
     pagedRawData,
     rawData,
@@ -45,12 +47,11 @@ export default function HomePage() {
     switchDataSourceMode,
     handleFileUpload,
     reloadCsvData,
-    onLatitudeChange,
-    onLongitudeChange,
+    onMapsLinkChange,
+    applyMapsLink,
     onCommodityChange,
     onTbaseChange,
     onCumhuChange,
-    onPlantingEndDateChange,
     loadLocationData,
   } = useHeatTracker();
 
@@ -73,17 +74,16 @@ export default function HomePage() {
               longitude={longitude}
               tbase={tbase}
               cumhu={cumhu}
-              csvFileStartDate={csvFileStartDate || plantingStartDate}
-              plantingEndDate={plantingEndDate}
-              maxPlantingEndDate={maxPlantingEndDate}
+              csvFileStartDate={csvFileStartDate}
+              mapsLink={mapsLink}
+              mapsLinkFeedback={mapsLinkFeedback}
               hasCsvData={csvSourceRows.length > 0}
               onFileUpload={handleFileUpload}
-              onLatitudeChange={onLatitudeChange}
-              onLongitudeChange={onLongitudeChange}
+              onMapsLinkChange={onMapsLinkChange}
+              onApplyMapsLink={applyMapsLink}
               onCommodityChange={onCommodityChange}
               onTbaseChange={onTbaseChange}
               onCumhuChange={onCumhuChange}
-              onPlantingEndDateChange={onPlantingEndDateChange}
               onReload={reloadCsvData}
             />
           ) : (
@@ -91,18 +91,19 @@ export default function HomePage() {
               commodity={commodity}
               latitude={latitude}
               longitude={longitude}
+              mapsLink={mapsLink}
+              mapsLinkFeedback={mapsLinkFeedback}
+              hasResolvedMapsCoordinates={hasResolvedMapsCoordinates}
               tbase={tbase}
               cumhu={cumhu}
               plantingStartDate={plantingStartDate}
-              plantingEndDate={plantingEndDate}
-              maxPlantingEndDate={maxPlantingEndDate}
-              onLatitudeChange={onLatitudeChange}
-              onLongitudeChange={onLongitudeChange}
+              maxAvailableDate={maxAvailableDate}
+              onMapsLinkChange={onMapsLinkChange}
+              onApplyMapsLink={applyMapsLink}
               onCommodityChange={onCommodityChange}
               onTbaseChange={onTbaseChange}
               onCumhuChange={onCumhuChange}
               onPlantingStartDateChange={setPlantingStartDate}
-              onPlantingEndDateChange={onPlantingEndDateChange}
               onLoadData={loadLocationData}
             />
           )}
@@ -121,6 +122,7 @@ export default function HomePage() {
           {activeTab === "Data Preview" && (
             <DataPreviewPanel
               rows={pagedRawData}
+              exportRows={rawData}
               totalRows={rawData.length}
               page={safeDataPreviewPage}
               totalPages={totalDataPreviewPages}
@@ -139,6 +141,7 @@ export default function HomePage() {
                 data={humidityRows}
                 yDomain={[0, 100]}
                 title="Daily Humidity Trends"
+                downloadFileName="humidity-trends"
                 todayMarkerDate={todayMarkerDate}
                 lines={[
                   { dataKey: "daily_max_humid", name: "Max humid", color: "#d64532" },
@@ -156,6 +159,7 @@ export default function HomePage() {
                 data={tempRows}
                 yDomain={[0, 50]}
                 title="Daily Temperature Trends"
+                downloadFileName="temperature-trends"
                 todayMarkerDate={todayMarkerDate}
                 lines={[
                   { dataKey: "daily_max_temp", name: "Max temp", color: "#d64532" },
@@ -173,6 +177,7 @@ export default function HomePage() {
                 data={cumulativeHuRows}
                 yDomain={undefined}
                 title="Cumulative Heat Units Over Time"
+                downloadFileName="heat-units"
                 todayMarkerDate={todayMarkerDate}
                 lines={[{ dataKey: "cumul_hu", name: "Cumulative HU", color: "#d64532" }]}
                 threshold={cumhu}

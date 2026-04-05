@@ -49,6 +49,15 @@ function toTime(date: Date): string {
   return `${hh}:${mm}:${ss}`;
 }
 
+function previousDateLabel(dateLabel: string): string {
+  return localDateLabel(addDays(new Date(`${dateLabel}T00:00:00`), -1));
+}
+
+function summarizeUpstreamError(body: string): string {
+  const compact = body.replace(/\s+/g, " ").trim();
+  return compact.length > 180 ? `${compact.slice(0, 180)}...` : compact;
+}
+
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const latitude = Number(searchParams.get("latitude"));
@@ -148,25 +157,48 @@ export async function GET(request: Request) {
       const forecastStartDate = startDate > today ? startDate : today;
 
       if (forecastStartDate <= endDate) {
-        const forecastUrl = new URL("https://api.open-meteo.com/v1/forecast");
-        forecastUrl.searchParams.set("latitude", String(latitude));
-        forecastUrl.searchParams.set("longitude", String(longitude));
-        forecastUrl.searchParams.set("hourly", "temperature_2m,relative_humidity_2m");
-        forecastUrl.searchParams.set("start_date", forecastStartDate);
-        forecastUrl.searchParams.set("end_date", endDate);
-        forecastUrl.searchParams.set("timezone", "auto");
+        const endDateCandidates = [endDate, previousDateLabel(endDate)].filter(
+          (candidate, index, arr) => candidate >= forecastStartDate && arr.indexOf(candidate) === index
+        );
 
-        const forecastResponse = await fetch(forecastUrl.toString(), { cache: "no-store" });
+        let forecastHourly: OpenMeteoHourly["hourly"];
+        let lastForecastStatus = 502;
+        let lastForecastError = "";
 
-        if (!forecastResponse.ok) {
-          return NextResponse.json(
-            { error: "Failed to fetch forecast hourly weather data from Open-Meteo." },
-            { status: forecastResponse.status }
-          );
+        for (const candidateEndDate of endDateCandidates) {
+          const forecastUrl = new URL("https://api.open-meteo.com/v1/forecast");
+          forecastUrl.searchParams.set("latitude", String(latitude));
+          forecastUrl.searchParams.set("longitude", String(longitude));
+          forecastUrl.searchParams.set("hourly", "temperature_2m,relative_humidity_2m");
+          forecastUrl.searchParams.set("start_date", forecastStartDate);
+          forecastUrl.searchParams.set("end_date", candidateEndDate);
+          forecastUrl.searchParams.set("timezone", "auto");
+
+          const forecastResponse = await fetch(forecastUrl.toString(), { cache: "no-store" });
+
+          if (!forecastResponse.ok) {
+            lastForecastStatus = forecastResponse.status;
+            const upstreamBody = await forecastResponse.text();
+            lastForecastError = summarizeUpstreamError(upstreamBody);
+            continue;
+          }
+
+          const forecastData = (await forecastResponse.json()) as OpenMeteoHourly;
+          forecastHourly = forecastData.hourly;
+          break;
         }
 
-        const forecastData = (await forecastResponse.json()) as OpenMeteoHourly;
-        const forecastHourly = forecastData.hourly;
+        if (!forecastHourly) {
+          const detail = lastForecastError ? ` Upstream response: ${lastForecastError}` : "";
+          return NextResponse.json(
+            {
+              error:
+                "Failed to fetch forecast hourly weather data from Open-Meteo." +
+                detail,
+            },
+            { status: lastForecastStatus }
+          );
+        }
 
         if (
           !forecastHourly ||

@@ -1,3 +1,4 @@
+import { useRef } from "react";
 import {
   Line,
   LineChart,
@@ -23,16 +24,56 @@ type LinePanelProps = {
   lines: LineConfig[];
   todayMarkerDate?: string;
   threshold?: number;
+  downloadFileName?: string;
 };
 
-export function LinePanel({ data, yDomain, title, lines, todayMarkerDate, threshold }: LinePanelProps) {
+export function LinePanel({
+  data,
+  yDomain,
+  title,
+  lines,
+  todayMarkerDate,
+  threshold,
+  downloadFileName,
+}: LinePanelProps) {
+  const containerRef = useRef<HTMLDivElement>(null);
+
   const hasTodayMarker = Boolean(
     todayMarkerDate && data.some((row) => String(row.date ?? "") === todayMarkerDate)
   );
 
+  const onDownloadGraphic = () => {
+    const svg = containerRef.current?.querySelector("svg");
+    if (!svg || !downloadFileName) {
+      return;
+    }
+
+    const serializer = new XMLSerializer();
+    const svgContent = serializer.serializeToString(svg);
+    const blob = new Blob([svgContent], { type: "image/svg+xml;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const anchor = document.createElement("a");
+    anchor.href = url;
+    anchor.download = `${downloadFileName}.svg`;
+    anchor.click();
+    URL.revokeObjectURL(url);
+  };
+
   return (
-    <div className="h-90 rounded-xl border border-(--line) bg-white p-2 md:p-3">
-      <p className="mb-2 px-2 text-sm font-semibold text-(--ink-soft)">{title}</p>
+    <div ref={containerRef} className="h-90 rounded-xl border border-(--line) bg-white p-2 md:p-3">
+      <div className="mb-2 flex items-center justify-between gap-2 px-2">
+        <p className="text-sm font-semibold text-(--ink-soft)">{title}</p>
+        {downloadFileName ? (
+          <button
+            type="button"
+            onClick={onDownloadGraphic}
+            disabled={!data.length}
+            className="rounded-md border border-(--line) bg-white px-3 py-1 text-xs font-medium disabled:opacity-40"
+          >
+            Download Graphic
+          </button>
+        ) : null}
+      </div>
       <ResponsiveContainer width="100%" height="90%">
         <LineChart data={data}>
           <CartesianGrid strokeDasharray="3 3" stroke="#dfd5c0" />

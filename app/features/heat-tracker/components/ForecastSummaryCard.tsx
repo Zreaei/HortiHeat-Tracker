@@ -5,6 +5,8 @@ type ForecastSummaryCardProps = {
 };
 
 export function ForecastSummaryCard({ currentHu, cumhu, harvestInfo }: ForecastSummaryCardProps) {
+  const isTargetReached = currentHu !== null && currentHu >= cumhu;
+
   return (
     <aside className="lg:col-span-4 flex min-w-0 flex-col justify-center rounded-xl border border-(--line) bg-[#fffdf7] p-5 text-center">
       <p className="mono text-xs uppercase tracking-[0.15em] text-(--ink-soft)">Current Heat Units</p>
@@ -12,7 +14,13 @@ export function ForecastSummaryCard({ currentHu, cumhu, harvestInfo }: ForecastS
         {currentHu ?? "-"}
       </p>
 
-      {harvestInfo ? (
+      {isTargetReached ? (
+        <>
+          <p className="mt-6 text-sm text-(--ink-soft)">Estimated harvest date</p>
+          <p className="mt-1 text-2xl font-semibold">{harvestInfo ?? "-"}</p>
+          <p className="mt-2 text-sm font-semibold text-[#1f7a3f]">Heat unit target is already reached.</p>
+        </>
+      ) : harvestInfo ? (
         <>
           <p className="mt-6 text-sm text-(--ink-soft)">Estimated harvest date</p>
           <p className="mt-1 text-2xl font-semibold">{harvestInfo}</p>

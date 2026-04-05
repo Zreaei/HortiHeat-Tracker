@@ -27,14 +27,16 @@ export function useHeatTracker() {
   const [csvSourceRows, setCsvSourceRows] = useState<RawRow[]>([]);
   const [csvFileStartDate, setCsvFileStartDate] = useState<string>("");
   const [csvFileEndDate, setCsvFileEndDate] = useState<string>("");
+  const [mapsLink, setMapsLink] = useState<string>("");
+  const [mapsLinkFeedback, setMapsLinkFeedback] = useState<string>();
+  const [hasResolvedMapsCoordinates, setHasResolvedMapsCoordinates] = useState<boolean>(false);
   const [dataPreviewPage, setDataPreviewPage] = useState<number>(1);
   const [forecastRows, setForecastRows] = useState<ForecastRow[]>([]);
   const [forecastStatus, setForecastStatus] = useState<string>();
 
   const todayIso = localDateLabel(new Date());
-  const maxPlantingEndDate = localDateLabel(addDays(new Date(), 15));
+  const maxAvailableDate = localDateLabel(addDays(new Date(), 15));
   const [plantingStartDate, setPlantingStartDate] = useState<string>(todayIso);
-  const [plantingEndDate, setPlantingEndDate] = useState<string>(todayIso);
   const todayMarkerDate = localDateLabel(new Date());
 
   const preprocessed = useMemo(() => preprocessRows(rawData, tbase), [rawData, tbase]);
@@ -108,12 +110,7 @@ export function useHeatTracker() {
     return { start, end };
   }, [rawData.length, safeDataPreviewPage]);
 
-  const applyCsvRange = async (
-    sourceRows: RawRow[],
-    rangeStartDate: string,
-    rangeEndDate: string,
-    sourceLastDate: string
-  ) => {
+  const applyCsvRange = async (sourceRows: RawRow[], rangeStartDate: string, sourceLastDate: string) => {
     if (!sourceRows.length) {
       setRawData([]);
       setForecastRows([]);
@@ -121,17 +118,12 @@ export function useHeatTracker() {
       return;
     }
 
-    let effectiveEndDate = rangeEndDate;
-    if (effectiveEndDate < rangeStartDate) {
-      effectiveEndDate = rangeStartDate;
-    }
-    if (effectiveEndDate > maxPlantingEndDate) {
-      effectiveEndDate = maxPlantingEndDate;
+    if (rangeStartDate > maxAvailableDate) {
+      setForecastStatus(`Planting start date cannot exceed ${maxAvailableDate}.`);
+      return;
     }
 
-    if (effectiveEndDate !== rangeEndDate) {
-      setPlantingEndDate(effectiveEndDate);
-    }
+    const effectiveEndDate = maxAvailableDate;
 
     const csvRowsInRange = sourceRows.filter((row) => {
       const parsed = parseDate(row.Date, row.Time);
@@ -140,7 +132,7 @@ export function useHeatTracker() {
       }
 
       const key = localDateLabel(parsed);
-      return key >= rangeStartDate && key <= sourceLastDate;
+      return key >= rangeStartDate && key <= sourceLastDate && key <= effectiveEndDate;
     });
 
     let combinedRows = [...csvRowsInRange];
@@ -151,7 +143,10 @@ export function useHeatTracker() {
       if (Number.isNaN(latitude) || Number.isNaN(longitude)) {
         extensionNote = " Open-Meteo continuation skipped due to invalid coordinates.";
       } else {
-        const continuationStart = localDateLabel(addDays(new Date(`${sourceLastDate}T00:00:00`), 1));
+        const continuationStart =
+          rangeStartDate > sourceLastDate
+            ? rangeStartDate
+            : localDateLabel(addDays(new Date(`${sourceLastDate}T00:00:00`), 1));
 
         try {
           const params = new URLSearchParams({
@@ -188,10 +183,7 @@ export function useHeatTracker() {
     setRawData(combinedRows);
     setDataPreviewPage(1);
     setForecastRows([]);
-    setForecastStatus(
-      `${combinedRows.length} records loaded for ${rangeStartDate} to ${effectiveEndDate}.${extensionNote}`
-    );
-    setActiveTab("Data Preview");
+    setForecastStatus(`${combinedRows.length} records loaded for ${rangeStartDate} to ${effectiveEndDate}.${extensionNote}`);
   };
 
   const handleFileUpload = async (event: ChangeEvent<HTMLInputElement>) => {
@@ -230,8 +222,7 @@ export function useHeatTracker() {
     setCsvFileStartDate(fileStartDate);
     setCsvFileEndDate(fileEndDate);
     setPlantingStartDate(fileStartDate);
-    setPlantingEndDate(fileEndDate > maxPlantingEndDate ? maxPlantingEndDate : fileEndDate);
-    await applyCsvRange(parsedRows, fileStartDate, fileEndDate, fileEndDate);
+    await applyCsvRange(parsedRows, fileStartDate, fileEndDate);
   };
 
   const reloadCsvData = async () => {
@@ -240,7 +231,7 @@ export function useHeatTracker() {
       return;
     }
 
-    await applyCsvRange(csvSourceRows, csvFileStartDate, plantingEndDate, csvFileEndDate);
+    await applyCsvRange(csvSourceRows, csvFileStartDate, csvFileEndDate);
   };
 
   const switchDataSourceMode = (nextMode: DataSourceMode) => {
@@ -256,24 +247,18 @@ export function useHeatTracker() {
     setCsvFileEndDate("");
     setDataPreviewPage(1);
     setPlantingStartDate(todayIso);
-    setPlantingEndDate(todayIso);
     setForecastStatus(undefined);
     setActiveTab("Data Preview");
   };
 
   const loadLocationData = async () => {
-    if (!plantingStartDate || !plantingEndDate) {
-      setForecastStatus("Please select planting start and end dates.");
+    if (!plantingStartDate) {
+      setForecastStatus("Please select planting start date.");
       return;
     }
 
-    if (plantingStartDate > plantingEndDate) {
-      setForecastStatus("Planting start date must be before or equal to end date.");
-      return;
-    }
-
-    if (plantingEndDate > maxPlantingEndDate) {
-      setForecastStatus(`Planting end date cannot exceed ${maxPlantingEndDate}.`);
+    if (plantingStartDate > maxAvailableDate) {
+      setForecastStatus(`Planting start date cannot exceed ${maxAvailableDate}.`);
       return;
     }
 
@@ -294,7 +279,7 @@ export function useHeatTracker() {
         latitude: String(latitude),
         longitude: String(longitude),
         startDate: plantingStartDate,
-        endDate: plantingEndDate,
+        endDate: maxAvailableDate,
       });
       const response = await fetch(`/api/location-data?${params.toString()}`, { cache: "no-store" });
       const payload = (await response.json()) as { error: string } | RawRow[];
@@ -309,20 +294,109 @@ export function useHeatTracker() {
       setDataPreviewPage(1);
       setForecastRows([]);
       setForecastStatus(
-        `${payload.length} location records loaded for (${latitude.toFixed(4)}, ${longitude.toFixed(4)}).`
+        `${payload.length} location records loaded for (${latitude.toFixed(5)}, ${longitude.toFixed(5)}).`
       );
-      setActiveTab("Data Preview");
     } catch {
       setForecastStatus("Location data request failed.");
     }
   };
 
-  const onLatitudeChange = (value: string) => {
-    setLatitude(parseNumberInput(value, DEFAULTS.latitude));
+  const parseCoordinatesFromText = (value: string): { lat: number; lon: number } | null => {
+    const normalized = value.trim();
+    if (!normalized) {
+      return null;
+    }
+
+    const patterns: RegExp[] = [
+      /@(-?\d+(?:\.\d+)?),(-?\d+(?:\.\d+)?)/,
+      /[?&](?:q|query)=(-?\d+(?:\.\d+)?),(-?\d+(?:\.\d+)?)/,
+      /!3d(-?\d+(?:\.\d+)?)!4d(-?\d+(?:\.\d+)?)/,
+      /(-?\d+(?:\.\d+)?)\s*,\s*(-?\d+(?:\.\d+)?)/,
+    ];
+
+    for (const pattern of patterns) {
+      const match = normalized.match(pattern);
+      if (!match) {
+        continue;
+      }
+
+      const lat = Number(match[1]);
+      const lon = Number(match[2]);
+      if (!Number.isFinite(lat) || !Number.isFinite(lon)) {
+        continue;
+      }
+
+      if (lat < -90 || lat > 90 || lon < -180 || lon > 180) {
+        return null;
+      }
+
+      return { lat, lon };
+    }
+
+    return null;
   };
 
-  const onLongitudeChange = (value: string) => {
-    setLongitude(parseNumberInput(value, DEFAULTS.longitude));
+  const onMapsLinkChange = (value: string) => {
+    setMapsLink(value);
+    setMapsLinkFeedback(undefined);
+    setHasResolvedMapsCoordinates(false);
+  };
+
+  const applyMapsLink = async () => {
+    const directParsed = parseCoordinatesFromText(mapsLink);
+    if (directParsed) {
+      setLatitude(directParsed.lat);
+      setLongitude(directParsed.lon);
+      setMapsLinkFeedback(`Coordinates detected: ${directParsed.lat.toFixed(5)}, ${directParsed.lon.toFixed(5)}`);
+      setHasResolvedMapsCoordinates(true);
+      return;
+    }
+
+    setMapsLinkFeedback("Resolving shortened Google Maps link...");
+
+    try {
+      const params = new URLSearchParams({ url: mapsLink.trim() });
+      const response = await fetch(`/api/maps-resolve?${params.toString()}`, { cache: "no-store" });
+      const payload = (await response.json()) as {
+        error?: string;
+        resolvedUrl?: string;
+        latitude?: number;
+        longitude?: number;
+      };
+
+      if (!response.ok || !payload.resolvedUrl) {
+        setMapsLinkFeedback(payload.error ?? "Unable to resolve Google Maps link.");
+        setHasResolvedMapsCoordinates(false);
+        return;
+      }
+
+      if (Number.isFinite(payload.latitude) && Number.isFinite(payload.longitude)) {
+        const lat = Number(payload.latitude);
+        const lon = Number(payload.longitude);
+        setLatitude(lat);
+        setLongitude(lon);
+        setMapsLinkFeedback(`Coordinates detected: ${lat.toFixed(5)}, ${lon.toFixed(5)}`);
+        setHasResolvedMapsCoordinates(true);
+        return;
+      }
+
+      const resolvedParsed = parseCoordinatesFromText(payload.resolvedUrl);
+      if (!resolvedParsed) {
+        setMapsLinkFeedback("Link resolved, but coordinates were not found. Try opening the pin in Google Maps and copy the full URL.");
+        setHasResolvedMapsCoordinates(false);
+        return;
+      }
+
+      setLatitude(resolvedParsed.lat);
+      setLongitude(resolvedParsed.lon);
+      setMapsLinkFeedback(
+        `Coordinates detected: ${resolvedParsed.lat.toFixed(5)}, ${resolvedParsed.lon.toFixed(5)}`
+      );
+      setHasResolvedMapsCoordinates(true);
+    } catch {
+      setMapsLinkFeedback("Unable to resolve Google Maps link right now. Please try again.");
+      setHasResolvedMapsCoordinates(false);
+    }
   };
 
   const onTbaseChange = (value: string) => {
@@ -345,10 +419,6 @@ export function useHeatTracker() {
     setCumhu(prefs.cumhu);
   };
 
-  const onPlantingEndDateChange = (value: string) => {
-    setPlantingEndDate(value > maxPlantingEndDate ? maxPlantingEndDate : value);
-  };
-
   return {
     activeTab,
     dataSourceMode,
@@ -357,11 +427,13 @@ export function useHeatTracker() {
     cumhu,
     latitude,
     longitude,
+    mapsLink,
+    mapsLinkFeedback,
+    hasResolvedMapsCoordinates,
     csvSourceRows,
     csvFileStartDate,
     plantingStartDate,
-    plantingEndDate,
-    maxPlantingEndDate,
+    maxAvailableDate,
     todayMarkerDate,
     pagedRawData,
     rawData,
@@ -382,12 +454,11 @@ export function useHeatTracker() {
     switchDataSourceMode,
     handleFileUpload,
     reloadCsvData,
-    onLatitudeChange,
-    onLongitudeChange,
+    onMapsLinkChange,
+    applyMapsLink,
     onTbaseChange,
     onCumhuChange,
     onCommodityChange,
-    onPlantingEndDateChange,
     loadLocationData,
   };
 }
