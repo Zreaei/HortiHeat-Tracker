@@ -9,6 +9,7 @@ type CsvSourceFormProps = {
   longitude: number;
   mapsLink: string;
   mapsLinkFeedback?: string;
+  hasResolvedMapsCoordinates: boolean;
   tbase: number;
   cumhu: number;
   csvFileStartDate: string;
@@ -28,6 +29,7 @@ export function CsvSourceForm({
   longitude,
   mapsLink,
   mapsLinkFeedback,
+  hasResolvedMapsCoordinates,
   tbase,
   cumhu,
   csvFileStartDate,
@@ -65,8 +67,12 @@ export function CsvSourceForm({
           </button>
         </div>
         <div className="mt-3 flex flex-wrap items-center gap-2 text-xs">
-          <span className="rounded-full border border-[#d9cfbb] bg-white px-2.5 py-1">Lat: {latitude.toFixed(5)}</span>
-          <span className="rounded-full border border-[#d9cfbb] bg-white px-2.5 py-1">Long: {longitude.toFixed(5)}</span>
+          <span className="rounded-full border border-[#d9cfbb] bg-white px-2.5 py-1">
+            Lat: {hasResolvedMapsCoordinates ? latitude.toFixed(5) : "Not set"}
+          </span>
+          <span className="rounded-full border border-[#d9cfbb] bg-white px-2.5 py-1">
+            Long: {hasResolvedMapsCoordinates ? longitude.toFixed(5) : "Not set"}
+          </span>
         </div>
         {mapsLinkFeedback ? <p className="mt-2 text-xs text-(--ink-soft)">{mapsLinkFeedback}</p> : null}
       </div>

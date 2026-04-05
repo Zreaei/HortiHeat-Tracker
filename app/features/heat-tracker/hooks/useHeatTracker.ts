@@ -21,8 +21,8 @@ export function useHeatTracker() {
   const [commodity, setCommodity] = useState<Commodity>(DEFAULTS.commodity);
   const [tbase, setTbase] = useState<number>(commodityPreferences[DEFAULTS.commodity].tbase);
   const [cumhu, setCumhu] = useState<number>(commodityPreferences[DEFAULTS.commodity].cumhu);
-  const [latitude, setLatitude] = useState<number>(DEFAULTS.latitude);
-  const [longitude, setLongitude] = useState<number>(DEFAULTS.longitude);
+  const [latitude, setLatitude] = useState<number>(Number.NaN);
+  const [longitude, setLongitude] = useState<number>(Number.NaN);
   const [rawData, setRawData] = useState<RawRow[]>([]);
   const [csvSourceRows, setCsvSourceRows] = useState<RawRow[]>([]);
   const [csvFileStartDate, setCsvFileStartDate] = useState<string>("");

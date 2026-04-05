@@ -77,6 +77,7 @@ export default function HomePage() {
               csvFileStartDate={csvFileStartDate}
               mapsLink={mapsLink}
               mapsLinkFeedback={mapsLinkFeedback}
+              hasResolvedMapsCoordinates={hasResolvedMapsCoordinates}
               hasCsvData={csvSourceRows.length > 0}
               onFileUpload={handleFileUpload}
               onMapsLinkChange={onMapsLinkChange}
