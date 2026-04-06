@@ -307,11 +307,22 @@ export function useHeatTracker() {
       return null;
     }
 
+    const plainPair = normalized.match(/^(-?\d+(?:\.\d+)?)\s*,\s*(-?\d+(?:\.\d+)?)$/);
+    if (plainPair) {
+      const lat = Number(plainPair[1]);
+      const lon = Number(plainPair[2]);
+      if (Number.isFinite(lat) && Number.isFinite(lon) && lat >= -90 && lat <= 90 && lon >= -180 && lon <= 180) {
+        return { lat, lon };
+      }
+      return null;
+    }
+
     const patterns: RegExp[] = [
       /@(-?\d+(?:\.\d+)?),(-?\d+(?:\.\d+)?)/,
       /[?&](?:q|query)=(-?\d+(?:\.\d+)?),(-?\d+(?:\.\d+)?)/,
       /!3d(-?\d+(?:\.\d+)?)!4d(-?\d+(?:\.\d+)?)/,
-      /(-?\d+(?:\.\d+)?)\s*,\s*(-?\d+(?:\.\d+)?)/,
+      /\/maps\/search\/(-?\d+(?:\.\d+)?),\+?(-?\d+(?:\.\d+)?)/,
+      /\/maps\/search\/(-?\d+(?:\.\d+)?),\s*(-?\d+(?:\.\d+)?)/,
     ];
 
     for (const pattern of patterns) {

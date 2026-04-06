@@ -22,8 +22,10 @@ function parseCoordinates(text: string): { latitude: number; longitude: number }
     /@(-?\d+(?:\.\d+)?),(-?\d+(?:\.\d+)?)/,
     /!3d(-?\d+(?:\.\d+)?)!4d(-?\d+(?:\.\d+)?)/,
     /[?&](?:q|query|ll)=(-?\d+(?:\.\d+)?),(-?\d+(?:\.\d+)?)/,
-    /center=(-?\d+(?:\.\d+)?),(-?\d+(?:\.\d+)?)/,
-    /center=(-?\d+(?:\.\d+)?)%2C(-?\d+(?:\.\d+)?)/,
+    /\/maps\/search\/(-?\d+(?:\.\d+)?),\+?(-?\d+(?:\.\d+)?)/,
+    /\/maps\/search\/(-?\d+(?:\.\d+)?),\s*(-?\d+(?:\.\d+)?)/,
+    /"latitude"\s*:\s*(-?\d+(?:\.\d+)?).*?"longitude"\s*:\s*(-?\d+(?:\.\d+)?)/,
+    /"lat"\s*:\s*(-?\d+(?:\.\d+)?).*?"lng"\s*:\s*(-?\d+(?:\.\d+)?)/,
   ];
 
   for (const pattern of patterns) {
