@@ -70,7 +70,7 @@ export function LinePanel({
             disabled={!data.length}
             className="rounded-md border border-(--line) bg-white px-3 py-1 text-xs font-medium disabled:opacity-40"
           >
-            Download Graphic
+            Download Graph
           </button>
         ) : null}
       </div>
