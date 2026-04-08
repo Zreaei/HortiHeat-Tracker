@@ -61,5 +61,5 @@ export type TabLabel =
   | "Data Preview"
   | "Humidity (%)"
   | "Temperature (C)"
-  | "Heat units"
+  | "Heat Units"
   | "Forecast (15 days)";

@@ -172,7 +172,7 @@ export default function HomePage() {
             </>
           )}
 
-          {activeTab === "Heat units" && (
+          {activeTab === "Heat Units" && (
             <>
               <LinePanel
                 data={cumulativeHuRows}
