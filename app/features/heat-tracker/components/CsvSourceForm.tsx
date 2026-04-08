@@ -1,5 +1,5 @@
 import type { ChangeEvent } from "react";
-import { commodityOptions, commodityPreferences } from "../constants";
+import { commodityOptions } from "../constants";
 import type { Commodity } from "../types";
 import { FormFieldCard } from "./FormFieldCard";
 
@@ -10,8 +10,8 @@ type CsvSourceFormProps = {
   mapsLink: string;
   mapsLinkFeedback?: string;
   hasResolvedMapsCoordinates: boolean;
-  tbase: number;
-  cumhu: number;
+  tbaseInput: string;
+  cumhuInput: string;
   csvFileStartDate: string;
   hasCsvData: boolean;
   onFileUpload: (event: ChangeEvent<HTMLInputElement>) => void;
@@ -30,8 +30,8 @@ export function CsvSourceForm({
   mapsLink,
   mapsLinkFeedback,
   hasResolvedMapsCoordinates,
-  tbase,
-  cumhu,
+  tbaseInput,
+  cumhuInput,
   csvFileStartDate,
   hasCsvData,
   onFileUpload,
@@ -93,17 +93,21 @@ export function CsvSourceForm({
 
       <FormFieldCard label="Tbase">
         <input
-          type="number"
-          value={Number.isFinite(tbase) ? tbase : commodityPreferences[commodity].tbase}
+          type="text"
+          inputMode="decimal"
+          pattern="-?[0-9]*[.,]?[0-9]*"
+          value={tbaseInput}
           onChange={(e) => onTbaseChange(e.target.value)}
           className="w-full rounded-lg border border-(--line) bg-white px-3 py-2"
         />
       </FormFieldCard>
 
-      <FormFieldCard label="Cumulative HU target">
+      <FormFieldCard label="Cumulative Heat Unit target">
         <input
-          type="number"
-          value={Number.isFinite(cumhu) ? cumhu : commodityPreferences[commodity].cumhu}
+          type="text"
+          inputMode="decimal"
+          pattern="-?[0-9]*[.,]?[0-9]*"
+          value={cumhuInput}
           onChange={(e) => onCumhuChange(e.target.value)}
           className="w-full rounded-lg border border-(--line) bg-white px-3 py-2"
         />

@@ -1,10 +1,8 @@
 import type { RawRow } from "../types";
-import { downloadCsv } from "../utils/csv";
 import { DataTable } from "./DataTable";
 
 type DataPreviewPanelProps = {
   rows: RawRow[];
-  exportRows: RawRow[];
   totalRows: number;
   page: number;
   totalPages: number;
@@ -16,7 +14,6 @@ type DataPreviewPanelProps = {
 
 export function DataPreviewPanel({
   rows,
-  exportRows,
   totalRows,
   page,
   totalPages,
@@ -25,14 +22,6 @@ export function DataPreviewPanel({
   onPrevPage,
   onNextPage,
 }: DataPreviewPanelProps) {
-  const onDownloadCsv = () => {
-    if (!exportRows.length) {
-      return;
-    }
-
-    downloadCsv(exportRows, "data-preview.csv");
-  };
-
   return (
     <>
       <DataTable rows={rows} />
@@ -41,14 +30,6 @@ export function DataPreviewPanel({
           Showing {rangeStart}-{rangeEnd} of {totalRows} rows
         </p>
         <div className="flex items-center gap-2">
-          <button
-            type="button"
-            onClick={onDownloadCsv}
-            disabled={!exportRows.length}
-            className="rounded-md border border-(--line) bg-white px-3 py-1.5 font-medium disabled:opacity-40"
-          >
-            Download CSV
-          </button>
           <button
             type="button"
             onClick={onPrevPage}

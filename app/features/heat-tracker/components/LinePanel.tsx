@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useCurrentPng } from "recharts-to-png";
 import {
   Line,
   LineChart,
@@ -36,38 +36,45 @@ export function LinePanel({
   threshold,
   downloadFileName,
 }: LinePanelProps) {
-  const containerRef = useRef<HTMLDivElement>(null);
+  const [getPng, { ref: chartRef, isLoading }] = useCurrentPng();
+
+  const formatAxisDate = (value: string | number): string => {
+    const text = String(value);
+    if (/^\d{4}-\d{2}-\d{2}$/.test(text)) {
+      return text;
+    }
+    return text;
+  };
 
   const hasTodayMarker = Boolean(
     todayMarkerDate && data.some((row) => String(row.date ?? "") === todayMarkerDate)
   );
 
-  const onDownloadGraphic = () => {
-    const svg = containerRef.current?.querySelector("svg");
-    if (!svg || !downloadFileName) {
+  const onDownloadGraphic = async () => {
+    if (!downloadFileName) {
       return;
     }
 
-    const serializer = new XMLSerializer();
-    const svgContent = serializer.serializeToString(svg);
-    const blob = new Blob([svgContent], { type: "image/svg+xml;charset=utf-8" });
-    const url = URL.createObjectURL(blob);
+    const pngDataUrl = await getPng();
+    if (!pngDataUrl) {
+      return;
+    }
+
     const anchor = document.createElement("a");
-    anchor.href = url;
-    anchor.download = `${downloadFileName}.svg`;
+    anchor.href = pngDataUrl;
+    anchor.download = `${downloadFileName}.png`;
     anchor.click();
-    URL.revokeObjectURL(url);
   };
 
   return (
-    <div ref={containerRef} className="h-90 rounded-xl border border-(--line) bg-white p-2 md:p-3">
+    <div className="h-90 rounded-xl border border-(--line) bg-white p-2 md:p-3">
       <div className="mb-2 flex items-center justify-between gap-2 px-2">
         <p className="text-sm font-semibold text-(--ink-soft)">{title}</p>
         {downloadFileName ? (
           <button
             type="button"
             onClick={onDownloadGraphic}
-            disabled={!data.length}
+            disabled={!data.length || isLoading}
             className="rounded-md border border-(--line) bg-white px-3 py-1 text-xs font-medium disabled:opacity-40"
           >
             Download Graph
@@ -75,9 +82,15 @@ export function LinePanel({
         ) : null}
       </div>
       <ResponsiveContainer width="100%" height="90%">
-        <LineChart data={data}>
+        <LineChart data={data} ref={chartRef}>
           <CartesianGrid strokeDasharray="3 3" stroke="#dfd5c0" />
-          <XAxis dataKey="date" />
+          <XAxis
+            dataKey="date"
+            interval="preserveStartEnd"
+            minTickGap={28}
+            tickMargin={8}
+            tickFormatter={formatAxisDate}
+          />
           <YAxis domain={yDomain} />
           <Tooltip />
           <Legend />

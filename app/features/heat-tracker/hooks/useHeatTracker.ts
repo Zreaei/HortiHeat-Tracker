@@ -16,11 +16,14 @@ import {
 } from "../utils/transform";
 
 export function useHeatTracker() {
+  const initialPrefs = commodityPreferences[DEFAULTS.commodity];
   const [activeTab, setActiveTab] = useState<TabLabel>("Data Preview");
   const [dataSourceMode, setDataSourceMode] = useState<DataSourceMode>("csv");
   const [commodity, setCommodity] = useState<Commodity>(DEFAULTS.commodity);
-  const [tbase, setTbase] = useState<number>(commodityPreferences[DEFAULTS.commodity].tbase);
-  const [cumhu, setCumhu] = useState<number>(commodityPreferences[DEFAULTS.commodity].cumhu);
+  const [tbase, setTbase] = useState<number>(initialPrefs.tbase);
+  const [cumhu, setCumhu] = useState<number>(initialPrefs.cumhu);
+  const [tbaseInput, setTbaseInput] = useState<string>(String(initialPrefs.tbase));
+  const [cumhuInput, setCumhuInput] = useState<string>(String(initialPrefs.cumhu));
   const [latitude, setLatitude] = useState<number>(Number.NaN);
   const [longitude, setLongitude] = useState<number>(Number.NaN);
   const [rawData, setRawData] = useState<RawRow[]>([]);
@@ -411,10 +414,20 @@ export function useHeatTracker() {
   };
 
   const onTbaseChange = (value: string) => {
+    setTbaseInput(value);
+    if (value.trim() === "") {
+      return;
+    }
+
     setTbase(parseNumberInput(value, commodityPreferences[commodity].tbase));
   };
 
   const onCumhuChange = (value: string) => {
+    setCumhuInput(value);
+    if (value.trim() === "") {
+      return;
+    }
+
     setCumhu(parseNumberInput(value, commodityPreferences[commodity].cumhu));
   };
 
@@ -428,6 +441,8 @@ export function useHeatTracker() {
     setCommodity(nextCommodity);
     setTbase(prefs.tbase);
     setCumhu(prefs.cumhu);
+    setTbaseInput(String(prefs.tbase));
+    setCumhuInput(String(prefs.cumhu));
   };
 
   return {
@@ -436,6 +451,8 @@ export function useHeatTracker() {
     commodity,
     tbase,
     cumhu,
+    tbaseInput,
+    cumhuInput,
     latitude,
     longitude,
     mapsLink,
@@ -454,6 +471,7 @@ export function useHeatTracker() {
     humidityRows,
     tempRows,
     cumulativeHuRows,
+    preprocessedRows: preprocessed,
     forecastCumulativeRows,
     forecastEnabled,
     currentHu,
