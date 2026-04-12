@@ -1,4 +1,4 @@
-# HortiHeat Tracker
+# HortiHeat Tracker 2.0
 
 HortiHeat Tracker is a precision agriculture web application that helps estimate harvest timing for horticultural commodities using heat-unit accumulation.
 
