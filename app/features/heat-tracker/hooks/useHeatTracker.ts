@@ -45,7 +45,7 @@ export function useHeatTracker() {
   const preprocessed = useMemo(() => preprocessRows(rawData, tbase), [rawData, tbase]);
   const humidityRows = useMemo(() => computeDailyHumidity(preprocessed), [preprocessed]);
   const tempRows = useMemo(() => computeDailyTemp(preprocessed), [preprocessed]);
-  const heatUnitRows = useMemo(() => toHeatUnitRows(tempRows, tbase), [tempRows, tbase]);
+  const heatUnitRows = useMemo(() => toHeatUnitRows(tempRows, preprocessed), [tempRows, preprocessed]);
   const cumulativeHuRows = useMemo(() => toCumulativeRows(heatUnitRows), [heatUnitRows]);
 
   const forecastEnabled = useMemo(() => cumulativeHuRows.length > 0, [cumulativeHuRows]);

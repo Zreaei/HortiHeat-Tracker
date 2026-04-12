@@ -30,7 +30,8 @@ export function preprocessRows(rows: RawRow[], tbase: number): PreprocessedRow[]
         timestamp: parsed,
         Temperature: row.Temperature,
         Humidity: row.Humidity,
-        heatunit: row.Temperature - tbase,
+        // GDH contribution per record: only temperatures above base contribute.
+        heatunit: Math.max(0, row.Temperature - tbase),
       };
     })
     .filter((row): row is PreprocessedRow => row !== null)
@@ -103,13 +104,38 @@ export function computeDailyTemp(rows: PreprocessedRow[]): DailyTemp[] {
     .sort((a, b) => a.date.localeCompare(b.date));
 }
 
-export function toHeatUnitRows(tempRows: DailyTemp[], tbase: number): HeatUnitRow[] {
+export function toHeatUnitRows(
+  tempRows: DailyTemp[],
+  preprocessedRows: PreprocessedRow[]
+): HeatUnitRow[] {
+  const sortedRows = [...preprocessedRows].sort((a, b) => a.timestamp.getTime() - b.timestamp.getTime());
+  const huByDate = sortedRows.reduce<Map<string, number>>((acc, row, index, rows) => {
+    const key = localDateLabel(row.timestamp);
+
+    const next = rows[index + 1];
+    const previousRow = rows[index - 1];
+
+    const derivedHours = next
+      ? (next.timestamp.getTime() - row.timestamp.getTime()) / 3_600_000
+      : previousRow
+        ? (row.timestamp.getTime() - previousRow.timestamp.getTime()) / 3_600_000
+        : 1;
+
+    const intervalHours = Number.isFinite(derivedHours) && derivedHours > 0 ? derivedHours : 1;
+    // Integrate hourly excess temperature then normalize to a daily heat-unit scale.
+    const degreeDayEquivalent = (row.heatunit * intervalHours) / 24;
+
+    const running = acc.get(key) ?? 0;
+    acc.set(key, running + degreeDayEquivalent);
+    return acc;
+  }, new Map<string, number>());
+
   return tempRows.map((row) => ({
     date: row.date,
     max_temp: row.daily_max_temp,
     avg_temp: row.daily_avg_temp,
     min_temp: row.daily_min_temp,
-    hu_t: round1((row.daily_max_temp + row.daily_min_temp) / 2 - tbase),
+    hu_t: round1(huByDate.get(row.date) ?? 0),
   }));
 }
 
@@ -126,7 +152,7 @@ export function toForecastRows(
 ): ForecastRow[] {
   return rows.map((row) => ({
     ...row,
-    hu_t: round1((row.max_temp + row.min_temp) / 2 - tbase),
+    hu_t: round1(Math.max(0, row.avg_temp - tbase)),
   }));
 }
 
