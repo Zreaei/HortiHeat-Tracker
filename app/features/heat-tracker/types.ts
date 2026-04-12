@@ -55,7 +55,7 @@ export type DownloadOption =
 
 export type DataSourceMode = "csv" | "location";
 
-export type Commodity = "Red Onion" | "Chili" | "Potato" | "Garlic";
+export type Commodity = "Shallot" | "Chili" | "Potato" | "Garlic";
 
 export type TabLabel =
   | "Data Preview"

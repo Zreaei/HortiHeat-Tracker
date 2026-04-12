@@ -9,7 +9,7 @@ export const tabs: readonly TabLabel[] = [
 ] as const;
 
 export const DEFAULTS = {
-  commodity: "Red Onion",
+  commodity: "Shallot",
   tbase: 10,
   cumhu: 740,
   latitude: -6.5574,
@@ -17,10 +17,10 @@ export const DEFAULTS = {
   dataPreviewPageSize: 50,
 } as const;
 
-export const commodityOptions: readonly Commodity[] = ["Red Onion", "Chili", "Potato", "Garlic"];
+export const commodityOptions: readonly Commodity[] = ["Shallot", "Chili", "Potato", "Garlic"];
 
 export const commodityPreferences: Record<Commodity, { tbase: number; cumhu: number }> = {
-  "Red Onion": { tbase: 10, cumhu: 740 },
+  Shallot: { tbase: 10, cumhu: 740 },
   Chili: { tbase: 10, cumhu: 2400 },
   Potato: { tbase: 7, cumhu: 1000 },
   Garlic: { tbase: 5, cumhu: 1200 },
