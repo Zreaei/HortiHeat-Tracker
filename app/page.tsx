@@ -184,7 +184,7 @@ export default function HomePage() {
             <h1 className="text-3xl font-semibold tracking-tight md:text-5xl">HortiHeat Tracker</h1>
           </div>
         </div>
-
+        
         <section className="rounded-2xl border border-(--line) bg-white/65 p-4 md:p-5">
           <SourceModeToggle dataSourceMode={dataSourceMode} onSwitch={switchDataSourceMode} />
           {dataSourceMode === "csv" ? (
