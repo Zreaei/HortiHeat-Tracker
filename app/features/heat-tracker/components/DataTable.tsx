@@ -10,12 +10,12 @@ export function DataTable<T extends object>({ rows }: DataTableProps<T>) {
   }
 
   return (
-    <div className="mt-4 overflow-auto rounded-xl border border-(--line)">
-      <table className="min-w-full border-collapse bg-white text-sm">
-        <thead className="mono bg-[#f5efe0] text-xs uppercase text-(--ink-soft)">
+    <div className="mt-4 overflow-auto rounded-xl border border-[#9fbe9f] bg-[#f6fbf5] shadow-[0_10px_24px_-18px_rgba(15,27,36,0.45)]">
+      <table className="min-w-full border-collapse bg-[#fbfef9] text-sm text-(--ink)">
+        <thead className="mono bg-[#dbead6] text-xs uppercase text-[#23412f]">
           <tr>
             {headers.map((header) => (
-              <th key={header} className="border-b border-(--line) px-3 py-2 text-left font-semibold">
+              <th key={header} className="border-b border-[#9fbe9f] px-3 py-2 text-left font-semibold">
                 {header}
               </th>
             ))}
@@ -23,9 +23,9 @@ export function DataTable<T extends object>({ rows }: DataTableProps<T>) {
         </thead>
         <tbody>
           {rows.map((row, idx) => (
-            <tr key={idx} className="odd:bg-white even:bg-[#fffcf4]">
+            <tr key={idx} className="odd:bg-[#fbfef9] even:bg-[#edf6ea] hover:bg-[#e2f0de]">
               {headers.map((header) => (
-                <td key={header} className="border-b border-(--line) px-3 py-2 align-top">
+                <td key={header} className="border-b border-[#c9dcc4] px-3 py-2 align-top">
                   {String((row as Record<string, unknown>)[header] ?? "")}
                 </td>
               ))}

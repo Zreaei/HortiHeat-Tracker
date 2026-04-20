@@ -48,7 +48,7 @@ export function CsvSourceForm({
         <input type="file" accept=".csv" multiple onChange={onFileUpload} className="block w-full text-sm underline" />
       </FormFieldCard>
 
-      <div className="md:col-span-3 rounded-xl border border-[#dcc8a5] bg-[linear-gradient(135deg,#fff9ea_0%,#fffdf7_100%)] p-4">
+      <div className="md:col-span-3 rounded-xl border border-(--line) p-4">
         <p className="mono mb-2 text-xs uppercase tracking-wide text-(--ink-soft)">Google Maps link</p>
         <div className="grid gap-2 md:grid-cols-[1fr_auto]">
           <input
@@ -67,10 +67,10 @@ export function CsvSourceForm({
           </button>
         </div>
         <div className="mt-3 flex flex-wrap items-center gap-2 text-xs">
-          <span className="rounded-full border border-[#d9cfbb] bg-white px-2.5 py-1">
+          <span className="rounded-full border border-(--line) bg-white px-2.5 py-1">
             Lat: {hasResolvedMapsCoordinates ? latitude.toFixed(5) : "Not set"}
           </span>
-          <span className="rounded-full border border-[#d9cfbb] bg-white px-2.5 py-1">
+          <span className="rounded-full border border-(--line) bg-white px-2.5 py-1">
             Long: {hasResolvedMapsCoordinates ? longitude.toFixed(5) : "Not set"}
           </span>
         </div>
