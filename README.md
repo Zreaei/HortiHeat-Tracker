@@ -13,20 +13,29 @@ This project is a Next.js + Tailwind implementation and supports both local CSV 
 - Interactive charts for humidity, temperature, and heat-unit trends.
 
 ## Setup
+1. Clone repository:
+```bash
+git clone https://github.com/Zreaei/HortiHeat-Tracker.git
+```
 
-1. Install dependencies:
+2. Move to directory
+```bash
+cd HortiHeat-Tracker
+```
+
+3. Install dependencies:
 
 ```bash
 npm install
 ```
 
-2. Run the development server:
+4. Run the development server:
 
 ```bash
 npm run dev
 ```
 
-3. Open http://localhost:3000.
+5. Open on http://localhost:3000.
 
 ## Forecast Data Source
 
