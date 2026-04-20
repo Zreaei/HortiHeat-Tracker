@@ -1,42 +1,59 @@
 # HortiHeat Tracker 2.0
 
-HortiHeat Tracker is a precision agriculture web application that helps estimate harvest timing for horticultural commodities using heat-unit accumulation.
+**Live Demo:** [HortiHeat Tracker on Vercel](https://hortiheat-tracker.vercel.app/)
 
-This project is a Next.js + Tailwind implementation and supports both local CSV data and location-based weather retrieval.
+## 📖 About the Project
 
-## Key Features
+**HortiHeat Tracker** is a web-based precision agriculture application designed to monitor crop growth and estimate harvest timing by calculating **Heat Unit (HU)** accumulation from the planting date to maturity, it provides data-driven insights for optimal harvest planning. 
 
-- GDH-based heat-unit accumulation tracking.
-- Commodity-oriented harvest timing workflow via cumulative HU targets.
-- Local CSV import for on-farm sensor data.
-- Location-based weather loading and short-range forecast support.
-- Interactive charts for humidity, temperature, and heat-unit trends.
+The application is tailored for key horticultural commodities, specifically: **Shallot (Red Onion), Chili, Potato, and Garlic**.
 
-## Setup
-1. Clone repository:
-```bash
-git clone https://github.com/Zreaei/HortiHeat-Tracker.git
-```
+## ✨ Key Features
 
-2. Move to directory
-```bash
-cd HortiHeat-Tracker
-```
+* **Heat-Unit Accumulation Tracking:** Accurately track crop growth stages based on the commodity's specific Base Temperature (Tbase) and Cumulative Heat Unit target.
+* **Flexible Temperature Sourcing:**
+    * **Location Coordinates:** Input latitude/longitude or paste a **Google Maps link** to automatically fetch local environmental data.
+    * **Local CSV Import:** Upload on-farm sensor data for localized accuracy.
+* **Interactive Data Visualization:** Downloadable dynamic charts displaying humidity, temperature variations, and heat-unit accumulation trends over time.
+* **Extended Weather Forecasting:** Integrated 15-day short-range forecast support to project future heat units and estimate exact harvest windows.
+* **Dataset Management:** Preview raw data directly in the dashboard and download complete datasets for further agricultural research or offline record-keeping.
 
-3. Install dependencies:
+## ⚙️ How It Works
 
-```bash
-npm install
-```
+1. **Select a Data Source:** Choose to upload historical/current CSV data or fetch location-based weather via coordinates/Google Maps.
+2. **Configure Parameters:** * Select your target **Commodity**. 
+    * Define the **Planting Start Date**.
+    * The system applies the relevant **Tbase** and **Cumulative Heat Unit target** for the selected crop.
+3. **Analyze Growth:** The application calculates daily heat units and compares the accumulated total against the crop's maturity target, projecting a visual timeline for the harvest.
 
-4. Run the development server:
+## 🚀 Setup & Installation
 
-```bash
-npm run dev
-```
+To run this project locally:
 
-5. Open on http://localhost:3000.
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/Zreaei/HortiHeat-Tracker.git
+   ```
 
-## Forecast Data Source
+2. **Navigate to the directory:**
+   ```bash
+   cd HortiHeat-Tracker
+   ```
 
-Forecast data is provided by Open-Meteo (no API key required).
+3. **Install dependencies:**
+   ```bash
+   npm install
+   ```
+
+4. **Run the development server:**
+   ```bash
+   npm run dev
+   ```
+
+5. **Access the application:**
+   Open [http://localhost:3000](http://localhost:3000) in your browser.
+
+## 📊 Data Sources & Tech Stack
+
+* **Frontend / Framework:** Next.js & Tailwind CSS
+* **Weather API:** Forecast and location-based historical data provided by [Open-Meteo](https://open-meteo.com/) (No API key required).
