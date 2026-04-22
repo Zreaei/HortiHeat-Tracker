@@ -30,7 +30,7 @@ export function preprocessRows(rows: RawRow[], tbase: number): PreprocessedRow[]
         timestamp: parsed,
         Temperature: row.Temperature,
         Humidity: row.Humidity,
-        // GDH contribution per record: only temperatures above base contribute.
+       
         heatunit: Math.max(0, row.Temperature - tbase),
       };
     })
@@ -122,7 +122,7 @@ export function toHeatUnitRows(
         : 1;
 
     const intervalHours = Number.isFinite(derivedHours) && derivedHours > 0 ? derivedHours : 1;
-    // Integrate hourly excess temperature then normalize to a daily heat-unit scale.
+    
     const degreeDayEquivalent = (row.heatunit * intervalHours) / 24;
 
     const running = acc.get(key) ?? 0;
@@ -144,16 +144,6 @@ export function toCumulativeRows(heatUnitRows: HeatUnitRow[]): CumHuRow[] {
     const previous = acc.length ? acc[acc.length - 1].cumul_hu : 0;
     return [...acc, { ...row, cumul_hu: round1(previous + row.hu_t) }];
   }, []);
-}
-
-export function toForecastRows(
-  rows: Array<{ date: string; max_temp: number; avg_temp: number; min_temp: number }>,
-  tbase: number
-): ForecastRow[] {
-  return rows.map((row) => ({
-    ...row,
-    hu_t: round1(Math.max(0, row.avg_temp - tbase)),
-  }));
 }
 
 export function buildCumulativeWithForecast(

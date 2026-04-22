@@ -1,4 +1,4 @@
-export function toCsv<T extends object>(rows: T[]): string {
+function toCsv<T extends object>(rows: T[]): string {
   if (!rows.length) {
     return "";
   }
